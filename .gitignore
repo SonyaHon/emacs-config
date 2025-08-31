@@ -1,4 +1,6 @@
 auto-save-list/
+node_modules/
+tree-sitter/
 eln-cache
 elpa
 projectile-bookmarks.eld
