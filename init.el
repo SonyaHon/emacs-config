@@ -129,6 +129,7 @@
 ;; lsp
 (use-package eglot
   :ensure nil
+  :hook ((typescript-ts-mode) . eglot-ensure)
   :config
   (add-to-list 'eglot-server-programs
 			   `(typescript-ts-mode . ("/Users/sonyahon/.emacs.d/node_modules/.bin/typescript-language-server" "--stdio"))))
@@ -193,6 +194,17 @@
 			 '("at main (\\(.*?\\):\\([0-9]+\\):\\([0-9]+\\))" 1 2 3))
 (add-to-list 'compilation-error-regexp-alist
 			 '("^\\(.*?\\):\\([0-9]+\\):\\([0-9]+\\):" 1 2 3))
+
+;; Formatters
+(use-package apheleia
+  :config
+  (push '(fmt-prettier . ("/Users/sonyahon/.emacs.d/node_modules/.bin/prettier" "--stdin-filepath" filepath)) apheleia-formatters)
+  (setf (alist-get 'typescript-ts-mode apheleia-mode-alist)	'(fmt-prettier))
+  :bind
+  ("C-x f" . nil)
+  ("C-x f b" . apheleia-format-buffer)
+  :init
+  (apheleia-global-mode +1))
 
 ;; Language: Typescript/Tsx
 (add-to-list 'auto-mode-alist
