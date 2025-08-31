@@ -35,7 +35,12 @@
   (gc-cons-threshold (* 50 1000 1000))
   (read-process-output-max (* 1024 1024))
   (make-backup-files nil)
-  (auto-save-default nil))
+  (Man-sed-command "gsed")
+  (use-short-answers t)
+  (auto-save-default nil)
+  
+  :init
+  (savehist-mode))
 
 ;; macos stuff
 (when (eq system-type 'darwin)
@@ -107,10 +112,25 @@
   :after corfu
   :init
   (add-hook 'completion-at-point-functions #'cape-dabbrev)
-  (add-hook 'completion-at-point-functions #'cape-dict)
+  (add-hook 'completion-at-point-functions #'cape-abbrev)
   (add-hook 'completion-at-point-functions #'cape-file)
   (add-hook 'completion-at-point-functions #'cape-elisp-block)
   (add-hook 'completion-at-point-functions #'cape-keyword))
+
+;; lsp
+(use-package eglot
+  :ensure nil
+  ;; LSP servers
+  ;;:config
+  ;;(add-to-list 'eglot-server-programs
+  ;;             `(some-mode . (command)))
+  )
+
+;; Language: Zig
+(use-package zig-mode
+  :custom
+  (zig-format-on-save nil)
+  (zig-ast-check-on-format nil))
 
 ;;;;;;;;;;;;;;;;;;;;; CUSTOM_FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;
 (defun load-styles ()
