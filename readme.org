@@ -1,0 +1,14 @@
+* emacs configuration
+** requirements:
+*** bun
+
+** installation
+*** install nodejs stuff
+#+begin_src bash
+  bun install --frozen-lockfile
+#+end_src
+*** install dependecies
+**** gsed `brew install gnu-sed`
+**** ripgrep `brew install rg`
+*** run emacs
+All dependecies will be auto-installed
