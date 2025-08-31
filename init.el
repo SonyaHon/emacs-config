@@ -27,6 +27,7 @@
   (display-line-numbers-type 'relative)
   (global-display-line-numbers-mode t)
   (mouse-wheel-progressive-speed nil)
+  (tab-always-indent t)
   (scroll-conservatively 10)
   (inhibit-startup-message t)
   (scroll-margin 8)
@@ -53,6 +54,7 @@
 (use-package orderless
   :custom
   (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
   (completion-category-overrides '((file (styles basic partial-completion)))))
 (use-package vertico :init (vertico-mode))
 
@@ -82,6 +84,33 @@
 
 (use-package crux
   :bind (("C-k" . crux-smart-kill-line)))
+
+(use-package corfu
+  :diminish cnnorfu-mode
+  :custom
+  (corfu-cycle t)
+  :bind
+  ("C-." . completion-at-point)
+  (:map corfu-map
+		("TAB" . nil)
+		("S-TAB" . nil)
+		([tab] . nil)
+		([backtab] . nil)
+		("RET" . nil)
+		("C-n" . corfu-next)
+		("C-p" . corfu-previous)
+		("C-y" . corfu-insert))
+  :init
+  (global-corfu-mode))
+
+(use-package cape
+  :after corfu
+  :init
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-dict)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+  (add-hook 'completion-at-point-functions #'cape-keyword))
 
 ;;;;;;;;;;;;;;;;;;;;; CUSTOM_FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;
 (defun load-styles ()
