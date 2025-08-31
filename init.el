@@ -65,7 +65,13 @@
 
 (use-package marginalia :after vertico :init (marginalia-mode))
 
-(use-package projectile :config (projectile-mode))
+(use-package ripgrep)
+(use-package projectile
+  :config (projectile-mode)
+  :bind
+  (("C-x p f" . projectile-find-file)
+   ("C-x p c" . projectile-compile-project)
+   ("C-x p g" . projectile-ripgrep)))
 
 (use-package helpful
   :bind
