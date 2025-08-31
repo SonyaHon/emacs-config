@@ -50,6 +50,10 @@
   :hook ((emacs-lisp-mode . paredit-mode)))
 
 ;; m-x
+(use-package orderless
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion)))))
 (use-package vertico :init (vertico-mode))
 
 (use-package marginalia :after vertico :init (marginalia-mode))
