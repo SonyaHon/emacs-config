@@ -130,6 +130,8 @@
 (use-package eglot
   :ensure nil
   :hook ((typescript-ts-mode) . eglot-ensure)
+  :bind
+  ("C-c l a" . eglot-code-actions)
   :config
   (add-to-list 'eglot-server-programs
 			   `(typescript-ts-mode . ("/Users/sonyahon/.emacs.d/node_modules/.bin/typescript-language-server" "--stdio"))))
@@ -206,26 +208,31 @@
   :init
   (apheleia-global-mode +1))
 
-;; Language: Typescript/Tsx
+;; Comments highlighting and more
+(use-package comment-tags
+  :bind
+  ("C-c l t" . comment-tags-list-tags-buffer)
+  :hook (prog-mode . comment-tags-mode))
+
+;; language: typescript/tsx
 (add-to-list 'auto-mode-alist
 			 '("\\.tsx?\\'" . typescript-ts-mode))
 
-
-;; Language: Zig
+;; language: zig
 (use-package zig-mode
   :custom
   (zig-format-on-save nil)
   (zig-ast-check-on-format nil))
 
-;;;;;;;;;;;;;;;;;;;;; CUSTOM_FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;; custom_functions ;;;;;;;;;;;;;;;;;;;;;
 (defun load-styles ()
   (load-theme 'gruber-darker t)
   (set-face-attribute 'default nil
-                      :font "Iosevka Nerd Font"
+                      :font "iosevka nerd font"
                       :height 120)
   (setq-default line-spacing 0.12))
 
-;;;;;;;;;;;;;;;;;;;;;; AUTO_GENERATED ;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;; auto_generated ;;;;;;;;;;;;;;;;;;;;;;
 (load-styles)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -242,3 +249,4 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(put 'downcase-region 'disabled nil)
