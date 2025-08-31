@@ -51,11 +51,33 @@
 
 ;; m-x
 (use-package vertico :init (vertico-mode))
+
 (use-package marginalia :after vertico :init (marginalia-mode))
 
-(use-package projectile
-  :config
-  (projectile-mode))
+(use-package projectile :config (projectile-mode))
+
+(use-package helpful
+  :bind
+  ("C-h f" . helpful-callable)
+  ("C-h v" . helpful-variable)
+  ("C-h k" . helpful-key)
+  ("C-h x" . helpful-command))
+
+;; utilities
+(use-package phi-search
+  :bind
+  ("C-s" . phi-search)
+  ("C-r" . phi-search-backward))
+
+(use-package multiple-cursors
+  :bind
+  ("C-c C-n" . mc/mark-next-like-this-symbol)
+  ("C-c C-p" . mc/unmark-next-like-this)
+  ("C-c C-." . mc/skip-to-next-like-this)
+  ("C-c C-l" . mc/edit-ends-of-lines))
+
+(use-package crux
+  :bind (("C-k" . crux-smart-kill-line)))
 
 ;;;;;;;;;;;;;;;;;;;;; CUSTOM_FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;
 (defun load-styles ()
