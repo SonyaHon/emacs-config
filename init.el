@@ -3,18 +3,18 @@
 ;; startup benchnarking
 (defun start/display-startup-time ()
   (message "Emacs loaded in %s with %d garbage collections."
-           (format "%.2f seconds"
-                   (float-time (time-subtract after-init-time before-init-time)))
-           gcs-done))
+    (format "%.2f seconds" (float-time (time-subtract after-init-time before-init-time)))
+    gcs-done))
 (add-hook 'emacs-startup-hook #'start/display-startup-time)
 
 ;; use package ensure
-(require 'use-package-ensure) 
+(require 'use-package-ensure)
 (setq use-package-always-ensure t)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/") ;; Sets default package repositories
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")
-                         ("nongnu" . "https://elpa.nongnu.org/nongnu/"))) ;; For Eat Terminal
+(setq package-archives
+  '(("melpa" . "https://melpa.org/packages/") ;; Sets default package repositories
+    ("org" . "https://orgmode.org/elpa/")
+    ("elpa" . "https://elpa.gnu.org/packages/")
+    ("nongnu" . "https://elpa.nongnu.org/nongnu/"))) ;; For Eat Terminal
 
 ;;;;;;;;;;;;;;;;;;;;; PACKAGES ;;;;;;;;;;;;;;;;;;;;;
 ;; sane defaults
@@ -38,7 +38,6 @@
   (Man-sed-command "gsed")
   (use-short-answers t)
   (auto-save-default nil)
-  
   :init
   (savehist-mode))
 
@@ -46,13 +45,16 @@
 (when (eq system-type 'darwin)
   (setq mac-command-modifier 'meta))
 
-
 (use-package diminish)
 
 (use-package gruber-darker-theme)
 
 (use-package paredit
   :diminish paredit-mode
+  :bind
+  (:map paredit-mode-map
+    ("M-<up>" . nil)
+    ("M-<down>" . nil))
   :hook ((emacs-lisp-mode . paredit-mode)))
 
 ;; m-x
@@ -93,6 +95,13 @@
   ("C-c C-." . mc/skip-to-next-like-this)
   ("C-c C-l" . mc/edit-ends-of-lines))
 
+(use-package move-text
+  :bind
+  ("M-<up>" . nil)
+  ("M-<up>" . move-text-up)
+  ("M-<down>" . nil)
+  ("M-<down>" . move-text-down))
+
 (use-package crux
   :bind (("C-k" . crux-smart-kill-line)))
 
@@ -103,14 +112,14 @@
   :bind
   ("C-." . completion-at-point)
   (:map corfu-map
-		("TAB" . nil)
-		("S-TAB" . nil)
-		([tab] . nil)
-		([backtab] . nil)
-		("RET" . nil)
-		("C-n" . corfu-next)
-		("C-p" . corfu-previous)
-		("C-y" . corfu-insert))
+    ("TAB" . nil)
+    ("S-TAB" . nil)
+    ([tab] . nil)
+    ([backtab] . nil)
+    ("RET" . nil)
+    ("C-n" . corfu-next)
+    ("C-p" . corfu-previous)
+    ("C-y" . corfu-insert))
   :init
   (global-corfu-mode))
 
@@ -129,12 +138,12 @@
 ;; lsp
 (use-package eglot
   :ensure nil
-  :hook ((typescript-ts-mode) . eglot-ensure)
+  :hook ((typescript-ts-mode c-mode) . eglot-ensure)
   :bind
   ("C-c l a" . eglot-code-actions)
   :config
   (add-to-list 'eglot-server-programs
-			   `(typescript-ts-mode . ("/Users/sonyahon/.emacs.d/node_modules/.bin/typescript-language-server" "--stdio"))))
+    `(typescript-ts-mode . ("/Users/sonyahon/.emacs.d/node_modules/.bin/typescript-language-server" "--stdio"))))
 
 ;; Compilation mode
 ;; Stolen from (http://endlessparentheses.com/ansi-colors-in-the-compilation-buffer-output.html)
@@ -143,7 +152,7 @@
   "Colorize from `compilation-filter-start' to `point'."
   (let ((inhibit-read-only t))
     (ansi-color-apply-on-region
-     compilation-filter-start (point))))
+      compilation-filter-start (point))))
 
 (add-hook 'compilation-filter-hook
           #'endless/colorize-compilation)
@@ -160,48 +169,49 @@
 
 (setq non-sgr-control-sequence-regexp
       (regexp-alternatives
-       '(;; icon name escape sequences
-         "\033\\][0-2];.*?\007"
-         ;; non-SGR CSI escape sequences
-         "\033\\[\\??[0-9;]*[^0-9;m]"
-         ;; noop
-         "\012\033\\[2K\033\\[1F"
-         )))
+        '(;; icon name escape sequences
+           "\033\\][0-2];.*?\007"
+           ;; non-SGR CSI escape sequences
+           "\033\\[\\??[0-9;]*[^0-9;m]"
+           ;; noop
+           "\012\033\\[2K\033\\[1F")))
 
 (defun filter-non-sgr-control-sequences-in-region (begin end)
   (save-excursion
     (goto-char begin)
     (while (re-search-forward
-            non-sgr-control-sequence-regexp end t)
+             non-sgr-control-sequence-regexp end t)
       (replace-match ""))))
 
 (defun filter-non-sgr-control-sequences-in-output (ignored)
   (let ((start-marker
-         (or comint-last-output-start
-             (point-min-marker)))
+          (or comint-last-output-start
+              (point-min-marker)))
         (end-marker
-         (process-mark
-          (get-buffer-process (current-buffer)))))
+          (process-mark
+            (get-buffer-process (current-buffer)))))
     (filter-non-sgr-control-sequences-in-region
-     start-marker
-     end-marker)))
+      start-marker
+      end-marker)))
 
 (add-hook 'comint-output-filter-functions
           'filter-non-sgr-control-sequences-in-output)
 
 ;; COMPILATION ERROR REGEXes
 (add-to-list 'compilation-error-regexp-alist
-			 '("at \\(.*?\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))
+  '("at \\(.*?\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))
 (add-to-list 'compilation-error-regexp-alist
-			 '("at main (\\(.*?\\):\\([0-9]+\\):\\([0-9]+\\))" 1 2 3))
+  '("at main (\\(.*?\\):\\([0-9]+\\):\\([0-9]+\\))" 1 2 3))
 (add-to-list 'compilation-error-regexp-alist
-			 '("^\\(.*?\\):\\([0-9]+\\):\\([0-9]+\\):" 1 2 3))
+  '("^\\(.*?\\):\\([0-9]+\\):\\([0-9]+\\):" 1 2 3))
 
 ;; Formatters
 (use-package apheleia
   :config
   (push '(fmt-prettier . ("/Users/sonyahon/.emacs.d/node_modules/.bin/prettier" "--stdin-filepath" filepath)) apheleia-formatters)
+  (push '(fmt-standard-clj . ("/Users/sonyahon/.emacs.d/node_modules/.bin/standard-clj" "fix" "-")) apheleia-formatters)
   (setf (alist-get 'typescript-ts-mode apheleia-mode-alist)	'(fmt-prettier))
+  (setf (alist-get 'emacs-lisp-mode apheleia-mode-alist) '(fmt-standard-clj))
   :bind
   ("C-x f" . nil)
   ("C-x f b" . apheleia-format-buffer)
@@ -216,7 +226,7 @@
 
 ;; language: typescript/tsx
 (add-to-list 'auto-mode-alist
-			 '("\\.tsx?\\'" . typescript-ts-mode))
+  '("\\.tsx?\\'" . typescript-ts-mode))
 
 ;; language: zig
 (use-package zig-mode
@@ -235,18 +245,21 @@
 ;;;;;;;;;;;;;;;;;;;;;; auto_generated ;;;;;;;;;;;;;;;;;;;;;;
 (load-styles)
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("01a9797244146bbae39b18ef37e6f2ca5bebded90d9fe3a2f342a9e863aaa4fd"
-	 default))
- '(package-selected-packages nil))
-(custom-set-faces
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+  '(custom-safe-themes
+     '("01a9797244146bbae39b18ef37e6f2ca5bebded90d9fe3a2f342a9e863aaa4fd"
+        default))
+  '(package-selected-packages nil))
+(custom-set-faces)
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
 (put 'downcase-region 'disabled nil)
